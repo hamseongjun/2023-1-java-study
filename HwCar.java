@@ -3,29 +3,50 @@ import java.util.Random;
 import java.util.Scanner;
 
 class Car {
-    private final int speed;
-    private final String name;
-    private int score;
+    protected int speed = 0;
+    protected String name;
+    protected int score = 0;
 
     Car(int speed, String name) {
         this.speed = speed;
         this.name = name;
     }
 
-    void plusScore(int num) {
-        score += num;
+    void go() {
+        score += speed;
     }
 
     void printInfo() {
         System.out.println("스피드는" + speed + "이고, 이름은 " + name + "입니다.");
     }
 
-    int getSpeed() {
-        return speed;
+    void sayScore() {
+        System.out.println("Score: " + score);
+    }
+}
+
+class SuperCar extends Car {
+    private long seed = System.currentTimeMillis();
+    private Random random = new Random();
+    private int booster = 0;
+
+    SuperCar(int speed, String name) {
+        super(speed, name);
     }
 
-    int getScore() {
-        return score;
+    @Override
+    void go() {
+        if (random.nextInt(2) == 1) {
+            score += 2 * speed;
+            booster++;
+        } else {
+            score += speed;
+        }
+    }
+
+    @Override
+    void sayScore() {
+        System.out.println("Score: " + score + ", booster: " + booster);
     }
 }
 
@@ -46,9 +67,16 @@ public class HwCar {
             int speed = scanner.nextInt();
             System.out.println(i + 1 + "번 째 자동차의 이름을 입력하세요.");
             String name = scanner.next();
+            System.out.println("이 자동차는 슈퍼카인가요? 0 또는 1 입력");
+            int IsSuperCar = scanner.nextInt();
 
-            Car car = new Car(speed, name);
-            cars.add(i, car);
+            if (IsSuperCar == 1) {
+                Car car = new SuperCar(speed, name);
+                cars.add(i, car);
+            } else if (IsSuperCar == 0) {
+                Car car = new Car(speed, name);
+                cars.add(i, car);
+            }
         }
 
         System.out.println("\n-----경기 참가자 소개-----");
@@ -60,12 +88,13 @@ public class HwCar {
 
         for (int i = 0; i < runningTime; i++) {
             for (Car participant : cars)
-                participant.plusScore(participant.getSpeed() * random.nextInt(2));
+                if (random.nextInt(2) == 1) {
+                    participant.go();
+                }
         }
 
         System.out.println("\n---최종 결과 발표---");
         for (Car participant : cars)
-            System.out.println(participant.getScore());
-
+            participant.sayScore();
     }
 }
